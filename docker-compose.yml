@@ -1,0 +1,29 @@
+version: '3'
+services:
+  nestjs-app:
+    image: nestjs-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8700:8700'
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - PORT=${PORT}
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      - postgres
+    links:
+      - postgres
+
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - '5432:5432'
+    env_file:
+      - .env

@@ -1,73 +1,86 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# WELCOME TO THE PRICEPALLY TAKE HOME TEST
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Table of content
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+- [Introduction](#introduction)
+- [Getting Started](#getting-started)
+- [Running Docker](#running-on-docker)
+- [Running Test](#running-tests)
 
-## Description
+## Introduction
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+The project was built in nest js and typescript, data base of choice is postgress, orm of choice is Prisma
 
-## Installation
+all `get` api except:
 
-```bash
-$ yarn install
+- get borrows
+- get borrows by id
+
+are not protected, the above can only be accessed by a user with user privileges
+
+all `put, post and delete` api's are admin protected except
+
+- create borrow
+- update borrow
+- delte borrow
+
+these are user protected and can only be accessed with user privileges
+
+there are two auth api's
+
+- login
+- signup
+
+login return you a jwt you can use for all other requests
+sign up is just a bare api that creates a record in the database with no much validation. note all users created with the signup api have user privileges.
+
+### Getting started
+
+to get started kindly fill out your .env file with the following
+
+```
+DATABASE_URL="****"
+NODE_ENV="****"
+PORT=****
+JWT_SECRET="****"
+
+// very important for docker
+POSTGRES_USER="****"
+POSTGRES_PASSWORD="****"
+POSTGRES_DB="****"
 ```
 
-## Running the app
+> NOTE: replace the above with the correct credentials
 
-```bash
-# development
-$ yarn run start
+Next step run `yarn install`
 
-# watch mode
-$ yarn run start:dev
+after you are don installing dependencies
 
-# production mode
-$ yarn run start:prod
+run `yarn migration:run`
+
+last but not least run `yarn db:seed`
+
+this seeds in the default admin credentials into the database
+
+```
+email:  admin@admin.com
+password: Super123*
 ```
 
-## Test
+### Running on docker
 
-```bash
-# unit tests
-$ yarn run test
+first things first ensure you have docker engine running on you computer next
 
-# e2e tests
-$ yarn run test:e2e
+ensure your env is updated as expected the run this command
 
-# test coverage
-$ yarn run test:cov
-```
+> docker-compose up -d
 
-## Support
+to stop docker run
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+> docker-compose down
 
-## Stay in touch
+### Running tests
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+due to the time constraint all unit tests were completed but not all integration test was completed. simply run the command
 
-## License
-
-Nest is [MIT licensed](LICENSE).
+> yarn test

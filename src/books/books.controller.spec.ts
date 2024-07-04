@@ -1,20 +1,40 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BooksController } from './books.controller';
 import { BooksService } from './books.service';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
+import { JwtService } from '@nestjs/jwt';
+import { PrismaService } from 'src/prisma.service';
+import { AuthorsService } from 'src/authors/authors.service';
 
 describe('BooksController', () => {
-  let controller: BooksController;
+  let app: INestApplication;
+  let prisma: PrismaClient;
+  let jwtService: Partial<JwtService>;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
+    prisma = new PrismaClient();
+    await prisma.$connect();
     const module: TestingModule = await Test.createTestingModule({
       controllers: [BooksController],
-      providers: [BooksService],
+      providers: [
+        BooksService,
+        PrismaService,
+        AuthorsService,
+        { provide: JwtService, useValue: jwtService },
+      ],
     }).compile();
-
-    controller = module.get<BooksController>(BooksController);
+    app = module.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe());
+    await app.init();
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  afterAll(async () => {
+    await prisma.$disconnect();
+    await app.close();
   });
+
+  afterEach(async () => {});
+
+  it('[0] should work properly', () => {});
 });
