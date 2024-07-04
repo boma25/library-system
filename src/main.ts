@@ -13,7 +13,13 @@ async function bootstrap() {
     type: VersioningType.URI,
     defaultVersion: ['1'],
   });
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
   app.enableCors({ origin: AllowedHosts, credentials: true });
   app.setGlobalPrefix('api');
 
