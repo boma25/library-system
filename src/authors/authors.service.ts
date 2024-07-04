@@ -15,7 +15,7 @@ export class AuthorsService {
   constructor(private prismaService: PrismaService) {}
 
   async findAuthorById(id: string): Promise<Author> {
-    const author = this.prismaService.author.findUnique({
+    const author = await this.prismaService.author.findUnique({
       where: { id },
     });
 
@@ -28,7 +28,7 @@ export class AuthorsService {
   async findAuthor(
     authorWhereUnique: Prisma.AuthorWhereUniqueInput,
   ): Promise<Author | null> {
-    return this.prismaService.author.findUnique({
+    return await this.prismaService.author.findUnique({
       where: authorWhereUnique,
     });
   }

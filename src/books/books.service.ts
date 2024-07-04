@@ -8,10 +8,14 @@ import { CreateBookDto } from './Dto/createBook.dto';
 import { UpdateBookDto } from './Dto/updateBook.dto';
 import { Book, Prisma } from '@prisma/client';
 import { TServerResponse } from 'src/@types/app.types';
+import { AuthorsService } from 'src/authors/authors.service';
 
 @Injectable()
 export class BooksService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private authorsService: AuthorsService,
+  ) {}
 
   async getBookById(id: string) {
     const book = await this.prismaService.book.findUnique({
@@ -90,6 +94,9 @@ export class BooksService {
       },
     });
     if (bookExist) throw new BadRequestException('Book already exist');
+
+    const author = await this.authorsService.findAuthorById(data.authorId);
+    if (!author) throw new BadRequestException('invalid author id');
     return this.prismaService.book.create({
       data,
     });
@@ -107,6 +114,12 @@ export class BooksService {
       if (bookExist && book.id !== bookExist.id)
         throw new BadRequestException('Book with this title already exist');
     }
+
+    if (data.authorId) {
+      const author = await this.authorsService.findAuthorById(data.authorId);
+      if (!author) throw new BadRequestException('invalid author id');
+    }
+
     return this.prismaService.book.update({
       where: { id },
       data,

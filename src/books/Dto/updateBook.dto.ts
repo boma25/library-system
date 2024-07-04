@@ -12,26 +12,26 @@ export class UpdateBookDto {
   @IsString()
   @IsNotEmpty()
   @IsOptional()
-  title: string;
+  title?: string;
 
   @ApiProperty({ example: 'Fiction' })
   @IsString()
   @IsNotEmpty()
   @IsOptional()
-  genre: string;
+  genre?: string;
 
   @ApiProperty({ example: 1925 })
   @IsNumber()
   @IsOptional()
-  publishedYear: number;
+  publishedYear?: number;
 
   @ApiProperty({ example: 5 })
   @IsNumber()
   @IsOptional()
-  availableCopies: number;
+  availableCopies?: number;
 
   @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000' })
   @IsUUID()
   @IsOptional()
-  authorId: string;
+  authorId?: string;
 }
