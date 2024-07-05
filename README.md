@@ -34,6 +34,8 @@ there are two auth api's
 login return you a jwt you can use for all other requests
 sign up is just a bare api that creates a record in the database with no much validation. note all users created with the signup api have user privileges.
 
+Note: all api's are prefixed with the `api/v1` i.e `localhost:${PORT}/api/v1/auth/login` also the api docs can be found at `localhost:${PORT}/api/api-docs`
+
 ### Getting started
 
 to get started kindly fill out your .env file with the following
