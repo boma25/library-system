@@ -83,6 +83,6 @@ to stop docker run
 
 ### Running tests
 
-due to the time constraint all unit tests were completed but not all integration test was completed. simply run the command
+to run all test cases simply run the command
 
 > yarn test

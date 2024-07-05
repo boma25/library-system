@@ -9,6 +9,12 @@ import { AuthorsService } from 'src/authors/authors.service';
 import { mockAdmin, mockAuthor } from 'src/utils/constants';
 import { authHelpers } from 'src/utils/helpers/auth.helpers';
 import * as request from 'supertest';
+import { faker } from '@faker-js/faker';
+import { APP_GUARD, Reflector } from '@nestjs/core';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guards';
+import { ConfigService } from '@nestjs/config';
+import { UserService } from 'src/user/user.service';
 
 describe('BooksController', () => {
   let app: INestApplication;
@@ -31,7 +37,19 @@ describe('BooksController', () => {
         BooksService,
         PrismaService,
         AuthorsService,
+        UserService,
+        Reflector,
+        ConfigService,
         { provide: JwtService, useValue: jwtService },
+        {
+          provide: APP_GUARD,
+          useClass: AuthGuard,
+        },
+
+        {
+          provide: APP_GUARD,
+          useClass: RolesGuard,
+        },
       ],
     }).compile();
     app = module.createNestApplication();
@@ -67,19 +85,21 @@ describe('BooksController', () => {
 
   it('[0] should work properly create book', async () => {
     const book = {
-      title: 'book title',
+      title: faker.lorem.words(3),
       authorId: mockAuthor.id,
-      genre: 'book genre',
-      publishedYear: 2021,
-      availableCopies: 10,
+      genre: faker.lorem.words(4),
+      publishedYear: faker.number.int({ min: 1000, max: 9999 }),
+      availableCopies: faker.number.int({ min: 1, max: 10 }),
     };
     const response = await request(app.getHttpServer())
       .post('/books/create')
+      .set('Authorization', 'Bearer token')
+      .set('Accept', 'application/json')
       .send(book)
       .expect(201);
 
     expect(response.body.data.title).toEqual(book.title);
-    expect(response.body.data.authorId).toEqual(book.authorId);
+    expect(response.body.data.authorId).toEqual(mockAuthor.id);
     expect(response.body.data.genre).toEqual(book.genre);
     expect(response.body.data.publishedYear).toEqual(book.publishedYear);
     expect(response.body.data.availableCopies).toEqual(book.availableCopies);
@@ -90,11 +110,15 @@ describe('BooksController', () => {
 
   it('[1] should work properly get book by id', async () => {
     const book = {
-      title: 'book title',
-      authorId: mockAuthor.id,
-      genre: 'book genre',
-      publishedYear: 2021,
-      availableCopies: 10,
+      title: faker.lorem.words(3),
+      author: {
+        connect: {
+          id: mockAuthor.id,
+        },
+      },
+      genre: faker.lorem.words(4),
+      publishedYear: faker.number.int({ min: 1000, max: 9999 }),
+      availableCopies: faker.number.int({ min: 1, max: 10 }),
     };
     const createdBook = await prisma.book.create({
       data: book,
@@ -104,7 +128,7 @@ describe('BooksController', () => {
       .expect(200);
 
     expect(response.body.data.title).toEqual(book.title);
-    expect(response.body.data.authorId).toEqual(book.authorId);
+    expect(response.body.data.authorId).toEqual(mockAuthor.id);
     expect(response.body.data.genre).toEqual(book.genre);
     expect(response.body.data.publishedYear).toEqual(book.publishedYear);
     expect(response.body.data.availableCopies).toEqual(book.availableCopies);
@@ -115,22 +139,28 @@ describe('BooksController', () => {
 
   it('[2] should work properly update book', async () => {
     const book = {
-      title: 'book title',
-      authorId: mockAuthor.id,
-      genre: 'book genre',
-      publishedYear: 2021,
-      availableCopies: 10,
+      title: faker.lorem.words(3),
+      author: {
+        connect: {
+          id: mockAuthor.id,
+        },
+      },
+      genre: faker.lorem.words(4),
+      publishedYear: faker.number.int({ min: 1000, max: 9999 }),
+      availableCopies: faker.number.int({ min: 1, max: 10 }),
     };
     const createdBook = await prisma.book.create({
       data: book,
     });
     const response = await request(app.getHttpServer())
       .put(`/books/${createdBook.id}`)
+      .set('Authorization', 'Bearer token')
+      .set('Accept', 'application/json')
       .send({ title: 'new title' })
       .expect(200);
 
     expect(response.body.data.title).toEqual('new title');
-    expect(response.body.data.authorId).toEqual(book.authorId);
+    expect(response.body.data.authorId).toEqual(mockAuthor.id);
     expect(response.body.data.genre).toEqual(book.genre);
     expect(response.body.data.publishedYear).toEqual(book.publishedYear);
     expect(response.body.data.availableCopies).toEqual(book.availableCopies);
@@ -141,17 +171,23 @@ describe('BooksController', () => {
 
   it('[3] should work properly delete book', async () => {
     const book = {
-      title: 'book title',
-      authorId: mockAuthor.id,
-      genre: 'book genre',
-      publishedYear: 2021,
-      availableCopies: 10,
+      title: faker.lorem.words(3),
+      author: {
+        connect: {
+          id: mockAuthor.id,
+        },
+      },
+      genre: faker.lorem.words(4),
+      publishedYear: faker.number.int({ min: 1000, max: 9999 }),
+      availableCopies: faker.number.int({ min: 1, max: 10 }),
     };
     const createdBook = await prisma.book.create({
       data: book,
     });
     await request(app.getHttpServer())
       .delete(`/books/${createdBook.id}`)
+      .set('Authorization', 'Bearer token')
+      .set('Accept', 'application/json')
       .expect(200);
 
     const deletedBook = await prisma.book.findUnique({
@@ -162,11 +198,15 @@ describe('BooksController', () => {
 
   it('[4] should work properly get all books', async () => {
     const book = {
-      title: 'book title',
-      authorId: mockAuthor.id,
-      genre: 'book genre',
-      publishedYear: 2021,
-      availableCopies: 10,
+      title: faker.lorem.words(3),
+      author: {
+        connect: {
+          id: mockAuthor.id,
+        },
+      },
+      genre: faker.lorem.words(4),
+      publishedYear: faker.number.int({ min: 1000, max: 9999 }),
+      availableCopies: faker.number.int({ min: 1, max: 10 }),
     };
     await prisma.book.create({
       data: book,
@@ -180,11 +220,15 @@ describe('BooksController', () => {
 
   it('[5] should work properly get all books with pagination', async () => {
     const book = {
-      title: 'book title',
-      authorId: mockAuthor.id,
-      genre: 'book genre',
-      publishedYear: 2021,
-      availableCopies: 10,
+      title: faker.lorem.words(3),
+      author: {
+        connect: {
+          id: mockAuthor.id,
+        },
+      },
+      genre: faker.lorem.words(4),
+      publishedYear: faker.number.int({ min: 1000, max: 9999 }),
+      availableCopies: faker.number.int({ min: 1, max: 10 }),
     };
     await prisma.book.create({
       data: book,

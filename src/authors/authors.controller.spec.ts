@@ -9,6 +9,11 @@ import * as request from 'supertest';
 import { mockAdmin } from 'src/utils/constants';
 import { authHelpers } from 'src/utils/helpers/auth.helpers';
 import { faker } from '@faker-js/faker';
+import { APP_GUARD, Reflector } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { UserService } from 'src/user/user.service';
+import { RolesGuard } from 'src/auth/guards/roles.guards';
 
 describe('AuthorsController', () => {
   let app: INestApplication;
@@ -31,7 +36,19 @@ describe('AuthorsController', () => {
       providers: [
         AuthorsService,
         PrismaService,
+        UserService,
+        Reflector,
+        ConfigService,
         { provide: JwtService, useValue: jwtService },
+        {
+          provide: APP_GUARD,
+          useClass: AuthGuard,
+        },
+
+        {
+          provide: APP_GUARD,
+          useClass: RolesGuard,
+        },
       ],
     }).compile();
 
