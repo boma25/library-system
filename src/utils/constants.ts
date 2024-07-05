@@ -16,3 +16,10 @@ export const mockUser = {
   password: faker.internet.password(),
   role: Role.USER,
 };
+
+export const mockAuthor = {
+  id: faker.string.uuid(),
+  name: faker.person.firstName(),
+  bio: faker.lorem.sentence(),
+  birthDate: faker.date.past(),
+};
